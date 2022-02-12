@@ -12,6 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 
 // turn on connection to db and server 
+// changed 'force' from false to true b/c it will allow tables to overwritten now 
+// if new information is added 
 sequelize.sync({ force: false }).then(() => {
     app.listen(PORT, () => console.log('Now listening'));
 });
