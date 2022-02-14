@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 // GET /api/users/1 
 router.get('/:id', (req, res) => {
     User.findOne({
-        attributes: { exclude: ['password']},
+        attributes: { exclude: ['password'] },
         where: {
             id: req.params.id
         },
@@ -26,6 +26,19 @@ router.get('/:id', (req, res) => {
             {
                 model: Post,
                 attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            // include the Comment model here:
+            {
+                model: Comment,
+                attributes: [
+                    'id',
+                    'comment_text',
+                    'created_at'
+                ],
+                include: {
+                    model: Post,
+                    attributes: ['title']
+                }
             },
             {
                 model: Post,
@@ -63,17 +76,17 @@ router.post('/', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-    
+
     // Query operation
     User.findOne({
-        where:{
+        where: {
             email: req.body.email
         }
-    }) .then(dbUserData => {
+    }).then(dbUserData => {
         if (!dbUserData) {
             res.status(400).json({ message: 'No user with that email address!' });
             return;
-        } 
+        }
 
         // add comment syntax in front of this line in the .then()
         // res.json({ user: dbUserData });
@@ -81,7 +94,7 @@ router.post('/login', (req, res) => {
         // Verify user 
         const validPassword = dbUserData.checkPassword(req.body.password);
 
-        if(!validPassword) {
+        if (!validPassword) {
             res.status(400).json({ message: 'Incorrect password!' });
             return;
         }
@@ -95,7 +108,7 @@ router.post('/login', (req, res) => {
 // PUT /api/users/1
 router.put('/:id', (req, res) => {
     User.update(req.body, {
-        individualHooks: true, 
+        individualHooks: true,
         where: {
             id: req.params.id
         }
